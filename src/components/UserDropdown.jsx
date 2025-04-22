@@ -49,7 +49,7 @@ const UserDropdown = ({user}) => {
         <img
           src={
             user?.avatar
-              ? `${process.env.VITE_API_URL}/uploads/avatar/${user.avatar}`
+              ? `${import.meta.env.VITE_API_URL}/uploads/avatar/${user.avatar}`
               : "/placeholder.svg"
           }
           alt={user.ten}
