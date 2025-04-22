@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2, Filter, ChevronLeft, ChevronRight, X, Check } from 'lucide-react';
-import productsData from '../../data/products';
 import { deleteProduct, getAllCategories, getAllProduct, getProducts, getProductsByCategory } from '~/untils/ApiHelper';
 import ProductModal from '~/components/Admin/ProductModal';
 import ProductTable from '~/components/Admin/ProductTable';
