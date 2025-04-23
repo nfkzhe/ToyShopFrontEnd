@@ -44,7 +44,7 @@ const ProductTable = ({
                                                     product.image && product.image[0]
                                                       ? product.image[0].startsWith('http')
                                                         ? product.image[0]
-                                                        : import.meta.env.VITE_API_URL + 'uploads/product/' + product.image[0]
+                                                        : import.meta.env.VITE_API_URL + '/uploads/product/' + product.image[0]
                                                       : '/placeholder.svg'
                                                   }
                                                 alt={product.ProductName}

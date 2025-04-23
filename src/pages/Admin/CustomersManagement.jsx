@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Search, Filter, ChevronLeft, ChevronRight, Eye, X, Mail, Phone } from "lucide-react"
+import { getUser } from "~/untils/ApiHelper"
 
 // Dữ liệu mẫu cho khách hàng
 const customersData = [
@@ -240,14 +241,14 @@ const CustomersManagement = () => {
   const customersPerPage = 10
   const statusOptions = ["Tất cả", "Hoạt động", "Không hoạt động"]
 
-  // Load customers from localStorage or use default data
-  useEffect(() => {
-    const storedCustomers = localStorage.getItem("admin-customers")
-    if (storedCustomers) {
-      setCustomers(JSON.parse(storedCustomers))
-    } else {
-      setCustomers(customersData)
+  const fetchUser = async () => {
+    const response = await getUser();
+    if (response && response.data) {
+      setCustomers(response.data)
     }
+  }
+  useEffect(() => {
+    fetchUser();
   }, [])
 
   // Filter customers based on search term and status
@@ -257,7 +258,7 @@ const CustomersManagement = () => {
     if (searchTerm) {
       result = result.filter(
         (customer) =>
-          customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          customer.ten.toLowerCase().includes(searchTerm.toLowerCase()) ||
           customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
           customer.phone.includes(searchTerm),
       )
@@ -274,11 +275,6 @@ const CustomersManagement = () => {
     setFilteredCustomers(result)
   }, [customers, searchTerm, selectedStatus])
 
-  // Save customers to localStorage when they change
-  useEffect(() => {
-    localStorage.setItem("admin-customers", JSON.stringify(customers))
-  }, [customers])
-
   // Pagination
   const totalPages = Math.ceil(filteredCustomers.length / customersPerPage)
   const indexOfLastCustomer = currentPage * customersPerPage
@@ -289,18 +285,18 @@ const CustomersManagement = () => {
   const handleViewCustomer = (customer) => {
     setSelectedCustomer(customer)
     // Lấy đơn hàng của khách hàng (nếu có)
-    setCustomerOrders(customerOrdersData[customer.id] || [])
+    setCustomerOrders(customerOrdersData[customer._id] || [])
     setIsModalOpen(true)
   }
 
   // Update customer status
   const handleUpdateStatus = (customerId, newStatus) => {
     const updatedCustomers = customers.map((customer) =>
-      customer.id === customerId ? { ...customer, status: newStatus } : customer,
+      customer._id === customerId ? { ...customer, status: newStatus } : customer,
     )
     setCustomers(updatedCustomers)
 
-    if (selectedCustomer && selectedCustomer.id === customerId) {
+    if (selectedCustomer && selectedCustomer._id === customerId) {
       setSelectedCustomer({ ...selectedCustomer, status: newStatus })
     }
   }
@@ -399,19 +395,23 @@ const CustomersManagement = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {currentCustomers.map((customer) => (
-                <tr key={customer.id}>
+                <tr key={customer._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full object-cover"
-                          src={customer.avatar || "/placeholder.svg"}
-                          alt={customer.name}
+                          src={
+                            customer?.avatar
+                              ? `${import.meta.env.VITE_API_URL}/uploads/avatar/${customer.avatar}`
+                              : "/placeholder.svg"
+                          }
+                          alt={customer.ten}
                         />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                        <div className="text-sm text-gray-500">{customer.id}</div>
+                        <div className="text-sm font-medium text-gray-900">{customer.ten}</div>
+                        <div className="text-sm text-gray-500">{customer._id}</div>
                       </div>
                     </div>
                   </td>
@@ -426,7 +426,7 @@ const CustomersManagement = () => {
                     <div className="text-sm text-gray-900">{customer.totalOrders}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{customer.totalSpent.toLocaleString()}đ</div>
+                    <div className="text-sm font-medium text-gray-900">{customer.totalSpent}đ</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
@@ -529,12 +529,16 @@ const CustomersManagement = () => {
                 <div className="md:w-1/3">
                   <div className="flex flex-col items-center">
                     <img
-                      src={selectedCustomer.avatar || "/placeholder.svg"}
-                      alt={selectedCustomer.name}
+                      src={
+                        selectedCustomer?.avatar
+                          ? `${import.meta.env.VITE_API_URL}/uploads/avatar/${selectedCustomer.avatar}`
+                          : "/placeholder.svg"
+                      }
+                      alt={selectedCustomer.ten}
                       className="w-32 h-32 rounded-full object-cover mb-4"
                     />
-                    <h4 className="text-xl font-semibold">{selectedCustomer.name}</h4>
-                    <p className="text-gray-500">Khách hàng #{selectedCustomer.id}</p>
+                    <h4 className="text-xl font-semibold">{selectedCustomer.ten}</h4>
+                    <p className="text-gray-500">Khách hàng #{selectedCustomer._id}</p>
                     <div className="mt-4 flex items-center">
                       <span
                         className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -566,7 +570,7 @@ const CustomersManagement = () => {
                       <span>{selectedCustomer.phone}</span>
                     </div>
                     <div>
-                      <p className="text-gray-500 mb-1">Địa ch��</p>
+                      <p className="text-gray-500 mb-1">Địa chỉ</p>
                       <p>{selectedCustomer.address}</p>
                     </div>
                     <div>
@@ -586,13 +590,13 @@ const CustomersManagement = () => {
                       </div>
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <p className="text-gray-500 text-sm">Tổng chi tiêu</p>
-                        <p className="text-2xl font-bold">{selectedCustomer.totalSpent.toLocaleString()}đ</p>
+                        <p className="text-2xl font-bold">{selectedCustomer.totalSpent}đ</p>
                       </div>
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <p className="text-gray-500 text-sm">Giá trị trung bình</p>
                         <p className="text-2xl font-bold">
                           {selectedCustomer.totalOrders > 0
-                            ? (selectedCustomer.totalSpent / selectedCustomer.totalOrders).toLocaleString()
+                            ? (selectedCustomer.totalSpent / selectedCustomer.totalOrders)
                             : 0}
                           đ
                         </p>
@@ -635,9 +639,9 @@ const CustomersManagement = () => {
                           </thead>
                           <tbody className="bg-white divide-y divide-gray-200">
                             {customerOrders.map((order) => (
-                              <tr key={order.id}>
+                              <tr key={order._id}>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                  <div className="text-sm font-medium text-blue-600">{order.id}</div>
+                                  <div className="text-sm font-medium text-blue-600">{order._id}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                   <div className="text-sm text-gray-900">{order.date}</div>

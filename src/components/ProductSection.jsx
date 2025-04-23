@@ -3,7 +3,7 @@ import ProductCard from './ProductCard';
 import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 import Slider from 'react-slick';
 
-const FeaturedProducts = ({ products }) => {
+const ProductSection = ({ products , title }) => {
     const sliderRef = useRef(null);
     const settings = {
         infinite: false,
@@ -35,7 +35,7 @@ const FeaturedProducts = ({ products }) => {
     return (
         <section className="py-12">
             <div className="container mx-auto px-4">
-                <h2 className="section-title">Sản phẩm nổi bật</h2>
+                <h2 className="section-title">{title}</h2>
 
                 {/* Nút điều hướng */}
                 <div className="flex justify-between mb-4 gap-2">
@@ -55,15 +55,17 @@ const FeaturedProducts = ({ products }) => {
 
                 {/* Slider hiển thị sản phẩm */}
                 <Slider ref={sliderRef} {...settings} className="grid gap-6">
-                    {products.map((product) => (
-                        <div key={product._id} className="px-2">
-                            <ProductCard product={product} />
-                        </div>
-                    ))}
+                    {products
+                        .filter((product) => product.discount > 0)
+                        .map((product) => (
+                            <div key={product._id} className="px-2">
+                                <ProductCard product={product} />
+                            </div>
+                        ))}
                 </Slider>
             </div>
         </section>
     );
 };
 
-export default FeaturedProducts;
+export default ProductSection;

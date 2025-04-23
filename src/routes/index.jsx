@@ -24,10 +24,11 @@ const publicRoutes = [
   { path: '/products/:id', component: ProductsDetailPage },
   { path: '/cart', component: CartPage },
   { path: '/about', component: AboutPage },
-  { path: '/contact', component: ContactPage },
+  { path: '/contact', component: ContactPage},
   { path: '/login', component: LoginPage },
   { path: '/register', component: RegisterPage },
   { path: '/profile', component: ProfilePage}, // chỉ cần đăng nhập
+
 ];
 
 const privateRoutes = [

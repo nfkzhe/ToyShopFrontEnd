@@ -118,7 +118,7 @@ const getTopSold = async () => {
 };
 const getUser = async () => {
     try {
-        const response = await AxiosInstance().get(`/api/user/find`);
+        const response = await AxiosInstance().get(`/api/user/`);
         if (response.status === 200) {
             return response.data;
         }

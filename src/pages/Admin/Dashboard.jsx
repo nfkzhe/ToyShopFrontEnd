@@ -233,14 +233,14 @@ const Dashboard = () => {
                               product.image && product.image[0]
                                 ? product.image[0].startsWith('http')
                                   ? product.image[0]
-                                  : import.meta.env.VITE_API_URL + 'uploads/product/' + product.image[0]
+                                  : import.meta.env.VITE_API_URL + '/uploads/product/' + product.image[0]
                                 : '/placeholder.svg'
                             }
                             alt={product.ProductName}
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 truncate max-w-[550px]">{product.ProductName}</div>
+                          <div className="text-sm font-medium text-gray-900 truncate max-w-[400px]">{product.ProductName}</div>
                         </div>
                       </div>
                     </td>
